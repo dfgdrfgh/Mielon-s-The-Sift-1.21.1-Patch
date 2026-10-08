@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "the_sift",
+  "version": "1.1.2+fabric.1.21.1.3",
+  "name": "Mielon's The Sift",
+  "description": "Explore The Sift: a strange dimension of siftslate, Ichor, ancient life, and resonant souls.",
+  "authors": [
+    "Mielon"
+  ],
+  "contributors": [
+    "ImpSteve \u2014 Dark Sniffer texture",
+    "Fuzja J\u0105drowa \u2014 Rift music disc",
+    "StrawberrySushi_ \u2014 Korean localization",
+    "Echo_Dev \u2014 Wellspring remix"
+  ],
+  "contact": {
+    "homepage": "https://x.com/MielonDev"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "mielon.thesift.TheSiftMod"
+    ],
+    "client": [
+      "mielon.thesift.client.TheSiftClient"
+    ]
+  },
+  "depends": {
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabricloader": ">=0.19.5",
+    "fabric-api": ">=0.116.17",
+    "geckolib": ">=4.9.3 <5"
+  },
+  "mixins": [
+    "the_sift.mixins.json",
+    {
+      "config": "the_sift.client.mixins.json",
+      "environment": "client"
+    },
+    "the_sift.backport.mixins.json"
+  ],
+  "icon": "assets/the_sift/icon.png"
+}

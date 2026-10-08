@@ -1,0 +1,6 @@
+{
+  "parent": "the_sift:backport/item/spear_in_hand",
+  "textures": {
+    "layer0": "the_sift:item/siftite_spear_in_hand"
+  }
+}

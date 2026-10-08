@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "the_sift:siftite_ingot"
+  },
+  "base": {
+    "tag": "the_sift:siftite_spear_bases"
+  },
+  "result": {
+    "id": "the_sift:siftite_spear"
+  },
+  "template": {
+    "item": "the_sift:siftite_upgrade_smithing_template"
+  }
+}

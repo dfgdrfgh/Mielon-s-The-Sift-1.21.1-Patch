@@ -1,0 +1,27 @@
+{
+  "parent": "the_sift:the_sift/root",
+  "display": {
+    "icon": {
+      "id": "the_sift:echo_golem_spawn_egg",
+      "components": {
+        "minecraft:custom_model_data": 1101
+      }
+    },
+    "title": {
+      "translate": "advancement.the_sift.like_father_and_son.title"
+    },
+    "description": {
+      "translate": "advancement.the_sift.like_father_and_son.description"
+    }
+  },
+  "criteria": {
+    "event": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "event"
+    ]
+  ]
+}

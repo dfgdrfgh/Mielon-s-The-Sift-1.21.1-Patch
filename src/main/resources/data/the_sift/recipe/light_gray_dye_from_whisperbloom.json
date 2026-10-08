@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "the_sift:whisperbloom"
+    }
+  ],
+  "result": {
+    "id": "minecraft:light_gray_dye"
+  }
+}

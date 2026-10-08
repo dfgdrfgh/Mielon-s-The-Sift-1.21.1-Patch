@@ -1,0 +1,151 @@
+package mielon.thesift.client.entity;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map.Entry;
+
+public final class RiftAssetModel {
+   public final List<RiftAssetModel.Bone> bones;
+   public final float duration;
+   public static final RiftAssetModel INSTANCE = new RiftAssetModel();
+
+   private static JsonObject json(String path) {
+      try {
+         JsonObject var2;
+         try (InputStream stream = RiftAssetModel.class.getResourceAsStream("/assets/the_sift/" + path)) {
+            if (stream == null) {
+               throw new IllegalStateException("Missing Rift asset: " + path);
+            }
+
+            var2 = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
+         }
+
+         return var2;
+      } catch (IOException var6) {
+         throw new IllegalStateException("Invalid Rift asset " + path, var6);
+      }
+   }
+
+   private RiftAssetModel() {
+      JsonObject animation = json("geckolib/animations/entity/rift.animation.json").getAsJsonObject("animations").getAsJsonObject("appear");
+      this.duration = animation.get("animation_length").getAsFloat();
+      JsonObject channels = animation.getAsJsonObject("bones");
+      List<RiftAssetModel.Bone> loaded = new ArrayList<>();
+      JsonArray geometry = json("geckolib/models/entity/rift.geo.json").getAsJsonArray("minecraft:geometry");
+
+      for (JsonElement entry : geometry.get(0).getAsJsonObject().getAsJsonArray("bones")) {
+         JsonObject bone = entry.getAsJsonObject();
+         String name = bone.get("name").getAsString();
+         List<RiftAssetModel.Cube> cubes = new ArrayList<>();
+
+         for (JsonElement raw : bone.getAsJsonArray("cubes")) {
+            JsonObject c = raw.getAsJsonObject();
+            cubes.add(new RiftAssetModel.Cube(vector(c.get("origin")), vector(c.get("size"))));
+         }
+
+         JsonObject channel = channels.getAsJsonObject(name);
+         loaded.add(new RiftAssetModel.Bone(name, vector(bone.get("pivot")), List.copyOf(cubes), keys(channel, "position"), keys(channel, "scale")));
+      }
+
+      this.bones = List.copyOf(loaded);
+   }
+
+   private static float[] vector(JsonElement element) {
+      JsonArray a = element.getAsJsonArray();
+      return new float[]{a.get(0).getAsFloat(), a.get(1).getAsFloat(), a.get(2).getAsFloat()};
+   }
+
+   private static List<RiftAssetModel.Key> keys(JsonObject bone, String name) {
+      List<RiftAssetModel.Key> result = new ArrayList<>();
+      if (bone != null && bone.has(name)) {
+         for (Entry<String, JsonElement> e : bone.getAsJsonObject(name).entrySet()) {
+            JsonObject key = e.getValue().getAsJsonObject();
+            result.add(
+               new RiftAssetModel.Key(Float.parseFloat(e.getKey()), vector(key.get("vector")), key.has("easing") ? key.get("easing").getAsString() : "linear")
+            );
+         }
+      }
+
+      result.sort(Comparator.comparingDouble(RiftAssetModel.Key::time));
+      return List.copyOf(result);
+   }
+
+   public static float[] sample(List<RiftAssetModel.Key> keys, float seconds, float fallback) {
+      if (keys.isEmpty()) {
+         return new float[]{fallback, fallback, fallback};
+      } else if (seconds <= ((RiftAssetModel.Key)keys.getFirst()).time) {
+         return ((RiftAssetModel.Key)keys.getFirst()).value;
+      } else {
+         for (int i = 1; i < keys.size(); i++) {
+            RiftAssetModel.Key right = keys.get(i);
+            RiftAssetModel.Key left = keys.get(i - 1);
+            if (!(seconds > right.time)) {
+               float t = (seconds - left.time) / (right.time - left.time);
+               String var7 = right.easing;
+
+               t = switch (var7) {
+                  case "easeOutCubic" -> 1.0F - (float)Math.pow(1.0F - t, 3.0);
+                  case "easeInCubic" -> t * t * t;
+                  case "easeInOutExpo" -> t == 0.0F || t == 1.0F
+                     ? t
+                     : (t < 0.5F ? (float)Math.pow(2.0, 20.0F * t - 10.0F) / 2.0F : (2.0F - (float)Math.pow(2.0, -20.0F * t + 10.0F)) / 2.0F);
+                  default -> t;
+               };
+               return new float[]{lerp(left.value[0], right.value[0], t), lerp(left.value[1], right.value[1], t), lerp(left.value[2], right.value[2], t)};
+            }
+         }
+
+         return ((RiftAssetModel.Key)keys.getLast()).value;
+      }
+   }
+
+   private static float lerp(float a, float b, float t) {
+      return a + (b - a) * t;
+   }
+
+   public List<RiftAssetModel.Box> boxes(float progress) {
+      float seconds = Math.max(0.0F, Math.min(1.0F, progress)) * this.duration;
+      List<RiftAssetModel.Box> result = new ArrayList<>(16);
+
+      for (RiftAssetModel.Bone bone : this.bones) {
+         float[] scale = sample(bone.scale, seconds, 1.0F);
+         float[] position = sample(bone.position, seconds, 0.0F);
+         if (!(scale[0] < 1.0E-4F) && !(scale[1] < 1.0E-4F) && !(scale[2] < 1.0E-4F)) {
+            for (RiftAssetModel.Cube cube : bone.cubes) {
+               float[] lo = new float[3];
+               float[] hi = new float[3];
+
+               for (int a = 0; a < 3; a++) {
+                  lo[a] = (bone.pivot[a] + (cube.origin[a] - bone.pivot[a]) * scale[a] + position[a]) / 16.0F;
+                  hi[a] = lo[a] + cube.size[a] * scale[a] / 16.0F;
+               }
+
+               result.add(new RiftAssetModel.Box(lo[0], lo[1], lo[2], hi[0], hi[1], hi[2]));
+            }
+         }
+      }
+
+      return result;
+   }
+
+   public record Bone(String name, float[] pivot, List<RiftAssetModel.Cube> cubes, List<RiftAssetModel.Key> position, List<RiftAssetModel.Key> scale) {
+   }
+
+   public record Box(float x0, float y0, float z0, float x1, float y1, float z1) {
+   }
+
+   public record Cube(float[] origin, float[] size) {
+   }
+
+   public record Key(float time, float[] value, String easing) {
+   }
+}

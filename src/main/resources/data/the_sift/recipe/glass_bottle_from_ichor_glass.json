@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "# #",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "item": "the_sift:ichor_glass"
+    }
+  },
+  "result": {
+    "id": "minecraft:glass_bottle",
+    "count": 3
+  }
+}

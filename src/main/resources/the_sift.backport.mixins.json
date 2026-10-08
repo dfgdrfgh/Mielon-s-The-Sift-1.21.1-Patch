@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "package": "mielon.thesift.backport.core.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "common.spear_behavior.LivingEntityMixin",
+    "common.spear_behavior.PlayerMixin",
+    "common.entity_movement.EntityMixin",
+    "common.entity_movement.ServerPlayerMixin",
+    "common.entity_movement.AbstractMinecartMixin",
+    "common.access.EntityAccessor"
+  ],
+  "client": [
+    "client.SpearAttackMixin",
+    "client.SpearMovementMixin",
+    "client.SpearHandMixin",
+    "client.SpearPoseMixin",
+    "client.SpearThirdPersonItemMixin",
+    "client.SpearItemModelMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_side_alt",
+  "textures": {
+    "edge": "the_sift:block/ichor_glass_pane_top",
+    "pane": "the_sift:block/ichor_glass"
+  }
+}

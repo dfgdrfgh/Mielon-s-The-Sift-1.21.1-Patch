@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:trident",
+    {
+      "id": "minecraft:netherite_spear",
+      "required": false
+    }
+  ]
+}

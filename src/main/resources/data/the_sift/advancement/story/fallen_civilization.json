@@ -1,0 +1,24 @@
+{
+  "parent": "minecraft:story/smelt_iron",
+  "display": {
+    "icon": {
+      "id": "minecraft:reinforced_deepslate"
+    },
+    "title": {
+      "translate": "advancement.the_sift.story.fallen_civilization.title"
+    },
+    "description": {
+      "translate": "advancement.the_sift.story.fallen_civilization.description"
+    }
+  },
+  "criteria": {
+    "ancient_city": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "ancient_city"
+    ]
+  ]
+}

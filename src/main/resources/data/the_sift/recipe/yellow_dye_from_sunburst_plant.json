@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "the_sift:sunburst_plant"
+    }
+  ],
+  "result": {
+    "id": "minecraft:yellow_dye",
+    "count": 2
+  }
+}

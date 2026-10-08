@@ -1,0 +1,11 @@
+{
+  "parent": "the_sift:block/sonorous_deepslate_horn",
+  "overrides": [
+    {
+      "predicate": {
+        "the_sift:mode": 1
+      },
+      "model": "the_sift:block/sonorous_deepslate_note"
+    }
+  ]
+}

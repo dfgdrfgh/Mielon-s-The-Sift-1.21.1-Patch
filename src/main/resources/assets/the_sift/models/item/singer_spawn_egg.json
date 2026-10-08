@@ -1,0 +1,50 @@
+{
+  "ambientocclusion": false,
+  "gui_light": "front",
+  "textures": {
+    "particle": "the_sift:item/singer_spawn_egg",
+    "egg": "the_sift:item/singer_spawn_egg"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        7.5
+      ],
+      "to": [
+        16,
+        16,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "texture": "#egg"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#egg"
+        }
+      }
+    }
+  ],
+  "overrides": [
+    {
+      "predicate": {
+        "custom_model_data": 1103
+      },
+      "model": "the_sift:item/singer_advancement_icon"
+    }
+  ]
+}

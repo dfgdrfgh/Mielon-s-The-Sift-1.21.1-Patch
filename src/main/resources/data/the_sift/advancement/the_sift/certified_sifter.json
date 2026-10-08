@@ -1,0 +1,79 @@
+{
+  "parent": "the_sift:the_sift/blood_of_the_gods",
+  "display": {
+    "icon": {
+      "id": "the_sift:siftite_boots"
+    },
+    "title": {
+      "translate": "advancement.the_sift.certified_sifter.title"
+    },
+    "description": {
+      "translate": "advancement.the_sift.certified_sifter.description"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "sift_wastes": {
+      "trigger": "minecraft:impossible"
+    },
+    "sift_deep_dark": {
+      "trigger": "minecraft:impossible"
+    },
+    "ichor_snowy_peaks": {
+      "trigger": "minecraft:impossible"
+    },
+    "siftslate_slopes": {
+      "trigger": "minecraft:impossible"
+    },
+    "siftslate_peaks": {
+      "trigger": "minecraft:impossible"
+    },
+    "overgrown_slopes": {
+      "trigger": "minecraft:impossible"
+    },
+    "overgrown_peaks": {
+      "trigger": "minecraft:impossible"
+    },
+    "overgrown_forest_slopes": {
+      "trigger": "minecraft:impossible"
+    },
+    "overgrown_forest": {
+      "trigger": "minecraft:impossible"
+    },
+    "overgrown_clearing": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "sift_wastes"
+    ],
+    [
+      "sift_deep_dark"
+    ],
+    [
+      "ichor_snowy_peaks"
+    ],
+    [
+      "siftslate_slopes"
+    ],
+    [
+      "siftslate_peaks"
+    ],
+    [
+      "overgrown_slopes"
+    ],
+    [
+      "overgrown_peaks"
+    ],
+    [
+      "overgrown_forest_slopes"
+    ],
+    [
+      "overgrown_forest"
+    ],
+    [
+      "overgrown_clearing"
+    ]
+  ]
+}

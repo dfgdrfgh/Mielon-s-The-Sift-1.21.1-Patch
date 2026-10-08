@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "the_sift:cobbled_siftslate"
+    }
+  },
+  "result": {
+    "id": "the_sift:cobbled_siftslate_slab",
+    "count": 6
+  }
+}
