@@ -1,0 +1,54 @@
+name: Build Mielon's The Sift (Fabric 1.21.1)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Fabric 1.21.1
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Compile and remap Fabric mod
+        run: ./gradlew --no-daemon --stacktrace build
+
+      - name: Stage installable mod JAR
+        shell: bash
+        run: |
+          mkdir -p release
+          find build/libs -maxdepth 1 -type f -name '*.jar' \
+            ! -name '*-sources.jar' ! -name '*-dev.jar' ! -name '*-javadoc.jar' \
+            -exec cp -v {} release/ \;
+          find release -maxdepth 1 -name '*.jar' -print
+          test "$(find release -maxdepth 1 -type f -name '*.jar' | wc -l)" -eq 1
+          jar tf release/*.jar > /dev/null
+          sha256sum release/*.jar
+
+      - name: Upload compiled Fabric mod
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mielons-The-Sift-Fabric-1.21.1
+          path: release/*.jar
+          if-no-files-found: error
+          retention-days: 30
