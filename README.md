@@ -16,6 +16,8 @@ Only the Siftite spear is registered by this mod. Smith it with a trident, a Sif
 
 The inventory, dropped-item, and shelf icons use normal generated-item rendering. First- and third-person contexts use the longer held spear model. This applies each transform once and preserves vanilla flat GUI lighting.
 
+All five spawn eggs use their full-color custom sprites with generated edge geometry and vanilla item hand transforms. Their advancement-icon overrides are retained.
+
 ## Build from source
 
 Set `JAVA_HOME` to a JDK 21 installation, then run:
@@ -25,6 +27,14 @@ Set `JAVA_HOME` to a JDK 21 installation, then run:
 ```
 
 On Windows use `gradlew.bat build`. The distributable JAR is in `build/libs/`; do not install the `sources` or `dev` JARs. The project uses Gradle 8.12, Fabric Loom 1.9.2, and Mojang mappings. A build-only copy of the unmodified GeckoLib 4.9.3 classes is included in `libs/` (its Loom manifest marker is removed for compatibility with this Loom release). GeckoLib remains an external runtime dependency.
+
+The optional spawn-egg check runs a Minecraft client and validates the baked sprites, outline geometry, colors, both first- and third-person hand transforms, and advancement overrides:
+
+```sh
+./gradlew -PspawnEggCheck runSpawnEggCheck
+```
+
+The checker closes the client after success and does not ship in the mod JAR.
 
 ## Provenance and licensing
 

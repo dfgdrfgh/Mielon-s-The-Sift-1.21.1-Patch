@@ -1,44 +1,9 @@
 {
-  "ambientocclusion": false,
+  "parent": "minecraft:item/generated",
   "gui_light": "front",
   "textures": {
-    "particle": "the_sift:item/dark_sniffer_spawn_egg",
-    "egg": "the_sift:item/dark_sniffer_spawn_egg"
+    "layer0": "the_sift:item/dark_sniffer_spawn_egg"
   },
-  "elements": [
-    {
-      "from": [
-        0,
-        0,
-        7.5
-      ],
-      "to": [
-        16,
-        16,
-        8.5
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            16,
-            0,
-            0,
-            16
-          ],
-          "texture": "#egg"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#egg"
-        }
-      }
-    }
-  ],
   "overrides": [
     {
       "predicate": {

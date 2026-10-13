@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "the_sift_spawn_egg_check",
+  "version": "1",
+  "environment": "client",
+  "entrypoints": {"client": ["mielon.thesift.check.SpawnEggRenderCheck"]},
+  "depends": {"the_sift": "*", "fabric-api": "*"}
+}

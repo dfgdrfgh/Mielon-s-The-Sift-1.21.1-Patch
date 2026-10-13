@@ -80,9 +80,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.component.BlockItemStateProperties;
-import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BushBlock;
@@ -112,14 +110,12 @@ public final class TheSiftClient implements net.fabricmc.api.ClientModInitialize
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(mielon.thesift.network.RiftLoadingPayload.TYPE,(payload,context)->context.client().execute(()->mielon.thesift.network.RiftLoadingPayload.clientHandler.accept(payload)));
     }
     public static void itemColors() {
-        net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
-            CustomModelData model = (CustomModelData)stack.get(DataComponents.CUSTOM_MODEL_DATA);
-            if (model != null && model.value() >= 1101 && model.value() <= 1103) {
-                return -1;
-            }
-            int color = ((SpawnEggItem)stack.getItem()).getColor(tintIndex);
-            return 0xFF000000 | color;
-        }, new Item[]{ModItems.ECHO_GOLEM_SPAWN_EGG, ModItems.DARK_SNIFFER_SPAWN_EGG, ModItems.SINGER_SPAWN_EGG});
+        // These sprites already contain their colors; generated-item layer0 is tinted by default.
+        net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry.ITEM.register(
+            (stack, tintIndex) -> -1,
+            ModItems.ECHO_GOLEM_SPAWN_EGG, ModItems.DARK_SNIFFER_SPAWN_EGG,
+            ModItems.SINGER_SPAWN_EGG, ModItems.SIFTER_SPAWN_EGG,
+            mielon.thesift.item.BlubItems.BLUB_SPAWN_EGG);
     }
 
     public static void setup() {

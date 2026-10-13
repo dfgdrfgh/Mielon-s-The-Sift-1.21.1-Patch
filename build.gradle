@@ -1,5 +1,5 @@
 plugins { id 'fabric-loom' version '1.9.2' }
-version = '1.1.2-fabric-backport.3'
+version = '1.1.2-fabric-backport.4'
 group = 'mielon.thesift'
 base { archivesName = 'mielons-the-sift-1.21.1' }
 repositories { mavenCentral() }
@@ -12,3 +12,27 @@ dependencies {
 }
 java { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21; withSourcesJar() }
 tasks.withType(JavaCompile).configureEach { options.release = 21; options.compilerArgs += ['-Xmaxerrs', '1000'] }
+
+// Optional client integration check, kept out of the installable mod and sources JAR.
+if (project.hasProperty('spawnEggCheck')) {
+ sourceSets {
+  spawnEggCheck {
+   compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+   runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+  }
+ }
+ loom {
+  mods {
+   the_sift { sourceSet sourceSets.main }
+   the_sift_spawn_egg_check { sourceSet sourceSets.spawnEggCheck }
+  }
+  runs {
+   spawnEggCheck {
+    client()
+    source sourceSets.spawnEggCheck
+    runDir 'run/spawn-egg-check'
+    ideConfigGenerated false
+   }
+  }
+ }
+}
