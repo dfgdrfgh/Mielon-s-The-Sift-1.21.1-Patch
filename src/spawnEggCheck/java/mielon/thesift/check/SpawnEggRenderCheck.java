@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import mielon.thesift.item.BlubItems;
 import mielon.thesift.item.ModItems;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ItemTransform;
@@ -54,7 +55,7 @@ public final class SpawnEggRenderCheck implements ClientModInitializer {
             require(quads.size()>2,names[i]+": generated outline sides exist");
             for(var quad:quads) {
                 require(quad.getSprite().contents().name().equals(sprite),names[i]+": face texture");
-                if(quad.isTinted()) require(client.getItemColors().getColor(stack,quad.getTintIndex())==-1,names[i]+": precolored texture has no added tint");
+                if(quad.isTinted()) require(ColorProviderRegistry.ITEM.get(stack.getItem()).getColor(stack,quad.getTintIndex())==-1,names[i]+": precolored texture has no added tint");
             }
             for(var context:new ItemDisplayContext[]{ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,ItemDisplayContext.FIRST_PERSON_LEFT_HAND,ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,ItemDisplayContext.THIRD_PERSON_LEFT_HAND,ItemDisplayContext.GROUND,ItemDisplayContext.FIXED}) {
                 sameTransform(model.getTransforms().getTransform(context),vanilla.getTransforms().getTransform(context),names[i]+": vanilla "+context+" transform");
@@ -67,8 +68,8 @@ public final class SpawnEggRenderCheck implements ClientModInitializer {
             ItemStack stack=new ItemStack(special[i]);stack.set(DataComponents.CUSTOM_MODEL_DATA,new CustomModelData(1101+i));
             var model=client.getItemRenderer().getModel(stack,null,null,0);
             require(model.getParticleIcon().contents().name().equals(ResourceLocation.fromNamespaceAndPath("the_sift","item/"+ids[i]+"_spawn_egg")),"advancement icon "+ids[i]);
-            require(client.getItemColors().getColor(stack,0)==-1,"advancement color "+ids[i]);
+            require(ColorProviderRegistry.ITEM.get(stack.getItem()).getColor(stack,0)==-1,"advancement color "+ids[i]);
         }
-        require((client.getItemColors().getColor(new ItemStack(Items.PIG_SPAWN_EGG),0)&0xFFFFFF)==((SpawnEggItem)Items.PIG_SPAWN_EGG).getColor(0),"vanilla spawn egg tint unchanged");
+        require((ColorProviderRegistry.ITEM.get(Items.PIG_SPAWN_EGG).getColor(new ItemStack(Items.PIG_SPAWN_EGG),0)&0xFFFFFF)==((SpawnEggItem)Items.PIG_SPAWN_EGG).getColor(0),"vanilla spawn egg tint unchanged");
     }
 }
