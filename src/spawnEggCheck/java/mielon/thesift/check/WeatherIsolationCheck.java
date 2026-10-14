@@ -19,7 +19,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.tags.BlockTags;
@@ -48,7 +48,7 @@ public final class WeatherIsolationCheck {
         // command handlers and client packet handling are Minecraft's actual code.
         WeatherPlayers players = allocate(WeatherPlayers.class);
         players.listeners = new HashMap<>();
-        DedicatedServer server = allocate(DedicatedServer.class);
+        IntegratedServer server = allocate(IntegratedServer.class);
         set(server, "playerList", players);
         ServerLevel overworld = world(server, Level.OVERWORLD);
         ServerLevel sift = world(server, TheSiftDimension.LEVEL_KEY);
@@ -95,7 +95,7 @@ public final class WeatherIsolationCheck {
         System.out.println("SIFT_WEATHER_ISOLATION_PASS packets=" + players.dimensionPackets);
     }
 
-    private static ServerLevel world(DedicatedServer server, ResourceKey<Level> dimension) throws Exception {
+    private static ServerLevel world(IntegratedServer server, ResourceKey<Level> dimension) throws Exception {
         Map<String, Object> weather = new HashMap<>();
         weather.put("RainTime", 10000);
         weather.put("ThunderTime", 10000);

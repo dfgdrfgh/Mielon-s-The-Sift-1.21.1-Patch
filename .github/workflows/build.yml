@@ -41,6 +41,29 @@ jobs:
           test -f run/spawn-egg-check/spawn-eggs-pass.txt
           test -f run/spawn-egg-check/weather-isolation-pass.txt
 
+      - name: Verify weather regression detects the old behavior
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        shell: bash
+        run: |
+          cp build/resources/main/the_sift.mixins.json weather-mixins-backup.json
+          trap 'cp weather-mixins-backup.json build/resources/main/the_sift.mixins.json' EXIT
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('build/resources/main/the_sift.mixins.json')
+          config = json.loads(path.read_text())
+          config['mixins'].remove('ServerLevelWeatherMixin')
+          path.write_text(json.dumps(config))
+          PY
+          set +e
+          timeout 10m xvfb-run -a ./gradlew --no-daemon -PspawnEggCheck -x processResources runSpawnEggCheck > weather-control.log 2>&1
+          result=$?
+          set -e
+          test "$result" -ne 0
+          grep -F 'Natural Sift rain leaked into the Overworld' weather-control.log
+          echo SIFT_WEATHER_UNPATCHED_CONTROL_PASS
+
       - name: Stage installable mod JAR
         shell: bash
         run: |
