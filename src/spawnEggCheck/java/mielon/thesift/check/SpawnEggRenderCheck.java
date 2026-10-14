@@ -24,6 +24,7 @@ public final class SpawnEggRenderCheck implements ClientModInitializer {
             if (checked || client.getOverlay()!=null) return;
             checked=true;
             try {
+                WeatherIsolationCheck.run(client);
                 run(client);
                 Files.writeString(Path.of("spawn-eggs-pass.txt"),"All five sprites, tint providers, generated outlines, hand transforms and advancement overrides passed.\n");
                 System.out.println("SIFT_SPAWN_EGGS_RENDER_PASS");
@@ -73,3 +74,4 @@ public final class SpawnEggRenderCheck implements ClientModInitializer {
         require((ColorProviderRegistry.ITEM.get(Items.PIG_SPAWN_EGG).getColor(new ItemStack(Items.PIG_SPAWN_EGG),0)&0xFFFFFF)==((SpawnEggItem)Items.PIG_SPAWN_EGG).getColor(0),"vanilla spawn egg tint unchanged");
     }
 }
+

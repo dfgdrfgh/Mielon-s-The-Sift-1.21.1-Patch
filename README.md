@@ -18,6 +18,8 @@ The inventory, dropped-item, and shelf icons use normal generated-item rendering
 
 All five spawn eggs use their full-color custom sprites with generated edge geometry and vanilla item hand transforms. Their advancement-icon overrides are retained.
 
+Weather start/stop and intensity packets stay within their source dimension. Rain in The Sift no longer appears in a clear Overworld or leaves `/weather clear` ineffective. Independent dimension weather and weather commands are retained.
+
 ## Build from source
 
 Set `JAVA_HOME` to a JDK 21 installation, then run:
@@ -34,7 +36,7 @@ The optional spawn-egg check runs a Minecraft client and validates the baked spr
 ./gradlew -PspawnEggCheck runSpawnEggCheck
 ```
 
-The checker closes the client after success and does not ship in the mod JAR.
+The checker also executes Minecraft's transformed server weather cycle and `/weather` handlers, delivering their packets to real client weather handlers. It checks natural rain, thunder, clear commands, and opposite weather in the Overworld and The Sift. The checker closes the client after success and does not ship in the mod JAR.
 
 ## Provenance and licensing
 
@@ -47,3 +49,4 @@ VanillaBackport upstream: https://github.com/ItsBlackGear/VanillaBackport (Black
 The supplied MIT-licensed fork: https://github.com/dfgdrfgh/TrueVanillaBackport.
 
 This is reconstructed Java source; local names, formatting, and comments can differ from the original developer's source. It is an unofficial compatibility build, not an upstream release.
+
