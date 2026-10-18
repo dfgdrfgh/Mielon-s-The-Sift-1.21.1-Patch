@@ -102,7 +102,10 @@ public final class SiftCreativeTabs {
             after(entries, Items.OAK_HANGING_SIGN,
                     ModBlocks.OVERGROWN_WILLOW_SIGN_ITEM,
                     ModBlocks.OVERGROWN_WILLOW_HANGING_SIGN_ITEM);
-            after(entries, Items.NOTE_BLOCK, ModBlocks.SONOROUS_DEEPSLATE_ITEM);
+            ItemStack horn = sonorousStack(SonorousDeepslateBlock.Mode.HORN);
+            ItemStack note = sonorousStack(SonorousDeepslateBlock.Mode.NOTE);
+            entries.addAfter(Items.NOTE_BLOCK, horn);
+            entries.addAfter(horn, note);
             after(entries, Items.RESPAWN_ANCHOR, ModBlocks.SIFT_PORTAL_ITEM, ModBlocks.SOUL_BLOCK_ITEM);
         });
 
@@ -151,6 +154,13 @@ public final class SiftCreativeTabs {
                     ModItems.DARK_SNIFFER_SPAWN_EGG, BlubItems.BLUB_SPAWN_EGG,
                     ModItems.SIFTER_SPAWN_EGG);
         });
+    }
+
+    private static ItemStack sonorousStack(SonorousDeepslateBlock.Mode mode) {
+        ItemStack stack = new ItemStack(ModBlocks.SONOROUS_DEEPSLATE_ITEM);
+        stack.set(DataComponents.BLOCK_STATE, new BlockItemStateProperties(
+                Map.of(SonorousDeepslateBlock.MODE.getName(), mode.getSerializedName())));
+        return stack;
     }
 
     private static void after(FabricItemGroupEntries entries, ItemLike anchor, ItemLike... items) {
