@@ -7,6 +7,8 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
+import java.util.List;
 
 /**
  * Equipment placement, independent of the general building/nature tabs.
@@ -21,12 +23,13 @@ final class SiftEquipmentCreativeTabs {
                 .register(SiftEquipmentCreativeTabs::populateTools);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT)
                 .register(SiftEquipmentCreativeTabs::populateCombat);
-        // All-tabs callbacks run AFTER the specific tab's additions. This
-        // means VanillaBackport's spear row has already been inserted before
-        // the Trident when we place the Siftite spear at its end.
+        // Add the spear in the specific Combat callback first, so it cannot
+        // disappear if another mod's tab processing changes event order.
+        // A final pass moves it after any VanillaBackport spears.
         ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> {
-            if (tab == BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.COMBAT.location())) {
-                entries.addBefore(Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+            if (CreativeModeTabs.COMBAT.location().equals(
+                    BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab))) {
+                positionSiftiteSpear(entries);
             }
         });
     }
@@ -57,7 +60,34 @@ final class SiftEquipmentCreativeTabs {
         entries.addAfter(ModItems.SIFTITE_LEGGINGS, ModItems.SIFTITE_BOOTS);
 
         entries.addAfter(Items.SNOWBALL, ModItems.ICHOR_SNOWBALL);
+        entries.addBefore(Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+    }
 
+    /**
+     * Some mods insert their entire spear line before Trident after our own
+     * Combat event. The late pass is deliberately idempotent: it removes any
+     * preliminary Siftite copy from both lists and reinserts exactly once at
+     * the end of the spear line, immediately before Trident.
+     */
+    private static void positionSiftiteSpear(FabricItemGroupEntries entries) {
+        List<ItemStack> display = entries.getDisplayStacks();
+        List<ItemStack> search = entries.getSearchTabStacks();
+        display.removeIf(stack -> stack.is(BackportContent.SIFTITE_SPEAR));
+        search.removeIf(stack -> stack.is(BackportContent.SIFTITE_SPEAR));
 
+        int tridentIndex = -1;
+        for (int i = 0; i < display.size(); i++) {
+            if (display.get(i).is(Items.TRIDENT)) {
+                tridentIndex = i;
+                break;
+            }
+        }
+        // Trident is a vanilla Combat item. If an incompatible mod removes
+        // it, retain access to Siftite Spear instead of silently losing it.
+        if (tridentIndex == -1) {
+            tridentIndex = display.size();
+        }
+        display.add(tridentIndex, new ItemStack(BackportContent.SIFTITE_SPEAR));
+        search.add(new ItemStack(BackportContent.SIFTITE_SPEAR));
     }
 }

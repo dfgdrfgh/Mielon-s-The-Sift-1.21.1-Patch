@@ -45,6 +45,7 @@ public final class CreativeTabsCheck {
         check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
         checkBefore(CreativeModeTabs.COMBAT, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
         checkSpearOrderAfterLateBackportInsert();
+        checkSpearOrderWithoutAllEntriesEvent();
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_AXE, ModItems.SIFTITE_AXE);
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_BOOTS,
@@ -162,6 +163,25 @@ public final class CreativeTabsCheck {
         System.out.println("SIFT_REAL_CREATIVE_TABS_PASS groups=" + actualGroupsChecked);
     }
 
+    private static void checkSpearOrderWithoutAllEntriesEvent() {
+        // Verify the original failure mode: just the regular Combat event
+        // must never leave the spear missing or appended far from Trident.
+        var display = new ArrayList<ItemStack>();
+        var search = new ArrayList<ItemStack>();
+        display.add(new ItemStack(Items.TRIDENT));
+        search.add(new ItemStack(Items.TRIDENT));
+        var entries = new FabricItemGroupEntries(
+            new CreativeModeTab.ItemDisplayParameters(FeatureFlags.VANILLA_SET, true, RegistryAccess.EMPTY),
+            display, search);
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).invoker().modifyEntries(entries);
+        require(display.size() >= 2 && display.get(0).is(BackportContent.SIFTITE_SPEAR)
+                && display.get(1).is(Items.TRIDENT),
+            "Siftite Spear is missing unless the ALL event also executes");
+        require(search.stream().filter(s -> s.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
+            "Siftite Spear missing from search before the ALL event");
+        System.out.println("SIFT_SPEAR_COMBAT_EVENT_PASS");
+    }
+
     private static void checkSpearOrderAfterLateBackportInsert() {
         // Simulate VanillaBackport's seven spear entries becoming available
         // AFTER the Sift's specific Combat tab callback, but BEFORE the
@@ -184,6 +204,8 @@ public final class CreativeTabsCheck {
             "Late backport spear item must precede Siftite Spear");
         require(display.get(anchor - 1).is(BackportContent.SIFTITE_SPEAR),
             "Siftite Spear must follow backported spears and precede Trident");
+        require(display.stream().filter(v -> v.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
+            "Siftite Spear duplicated in Combat display after late backport insertion");
         require(search.stream().filter(v -> v.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
             "Siftite Spear missing or duplicated in search after late backport insertion");
         System.out.println("SIFT_LATE_BACKPORT_SPEAR_ORDER_PASS");
