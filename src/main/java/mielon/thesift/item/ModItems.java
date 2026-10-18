@@ -324,11 +324,11 @@ public final class ModItems {
             output.accept(MUSIC_DISC_WELLSPRING);
             output.accept(ModBlocks.SIFT_PORTAL_ITEM);
             output.accept(SIFT_RIFT);
-            output.accept(SINGER_SPAWN_EGG);
-            output.accept(ECHO_GOLEM_SPAWN_EGG);
-            output.accept(DARK_SNIFFER_SPAWN_EGG);
             output.accept(BlubItems.BLUB_SPAWN_EGG);
+            output.accept(DARK_SNIFFER_SPAWN_EGG);
+            output.accept(ECHO_GOLEM_SPAWN_EGG);
             output.accept(SIFTER_SPAWN_EGG);
+            output.accept(SINGER_SPAWN_EGG);
          }
       )
       .build();

@@ -34,34 +34,39 @@ public final class CreativeTabsCheck {
     public static void run() {
         check(ModItems.CREATIVE_TAB_KEY, ModItems.SIFTITE_SWORD, BackportContent.SIFTITE_SPEAR);
         check(ModItems.CREATIVE_TAB_KEY, ModBlocks.OVERGROWN_WILLOW_PLANKS_ITEM, BackportContent.SHELF_ITEM);
-        check(CreativeModeTabs.BUILDING_BLOCKS, Items.REINFORCED_DEEPSLATE,
-            ModBlocks.REINFORCED_SIFTSLATE_ITEM, ModBlocks.SIFTSLATE_ITEM);
-        check(CreativeModeTabs.BUILDING_BLOCKS, Items.MANGROVE_PLANKS,
-            ModBlocks.OVERGROWN_WILLOW_LOG_ITEM, ModBlocks.OVERGROWN_WILLOW_WOOD_ITEM);
-        check(CreativeModeTabs.NATURAL_BLOCKS, Items.SCULK,
-            ModBlocks.SIFTSLATE_GROWTH_ITEM, ModBlocks.SIFT_RUBBLE_ITEM);
-        check(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.CRAFTING_TABLE, BackportContent.SHELF_ITEM);
+        check(CreativeModeTabs.BUILDING_BLOCKS, Items.REINFORCED_DEEPSLATE, ModBlocks.REINFORCED_SIFTSLATE_ITEM);
+        check(CreativeModeTabs.BUILDING_BLOCKS, Items.DEEPSLATE, ModBlocks.SIFTSLATE_ITEM, ModBlocks.COBBLED_SIFTSLATE_ITEM);
+        check(CreativeModeTabs.BUILDING_BLOCKS, Items.MANGROVE_LOG, ModBlocks.OVERGROWN_WILLOW_LOG_ITEM);
+        check(CreativeModeTabs.BUILDING_BLOCKS, Items.MANGROVE_PLANKS, ModBlocks.OVERGROWN_WILLOW_PLANKS_ITEM);
+        check(CreativeModeTabs.NATURAL_BLOCKS, Items.SCULK, ModBlocks.SIFTSLATE_GROWTH_ITEM, ModBlocks.SIFT_RUBBLE_ITEM);
+        check(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.CHISELED_BOOKSHELF, BackportContent.SHELF_ITEM);
+        check(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.MANGROVE_SIGN, ModBlocks.OVERGROWN_WILLOW_SIGN_ITEM);
+        check(CreativeModeTabs.REDSTONE_BLOCKS, Items.MANGROVE_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
+        check(CreativeModeTabs.REDSTONE_BLOCKS, Items.MANGROVE_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
         check(CreativeModeTabs.COMBAT, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
-        check(CreativeModeTabs.COMBAT, Items.NETHERITE_HELMET, ModItems.SIFTITE_HELMET);
         check(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.NETHERITE_PICKAXE, ModItems.SIFTITE_PICKAXE);
-        check(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.MUSIC_DISC_OTHERSIDE,
+        check(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.MUSIC_DISC_PRECIPICE,
             ModItems.MUSIC_DISC_RIFT, ModItems.MUSIC_DISC_WELLSPRING);
-        check(CreativeModeTabs.INGREDIENTS, Items.NETHERITE_INGOT,
-            ModItems.SIFTITE_INGOT, ModItems.SIFTITE_NUGGET);
-        check(CreativeModeTabs.FOOD_AND_DRINKS, Items.COOKED_PORKCHOP,
-            ModItems.RAW_SIFTER_MEAT, ModItems.COOKED_SIFTER_MEAT);
-        check(CreativeModeTabs.SPAWN_EGGS, Items.SNIFFER_SPAWN_EGG,
-            ModItems.SINGER_SPAWN_EGG, ModItems.ECHO_GOLEM_SPAWN_EGG,
-            ModItems.DARK_SNIFFER_SPAWN_EGG, BlubItems.BLUB_SPAWN_EGG,
-            ModItems.SIFTER_SPAWN_EGG);
+        check(CreativeModeTabs.INGREDIENTS, Items.NETHERITE_INGOT, ModItems.SIFTITE_INGOT);
+        check(CreativeModeTabs.INGREDIENTS, Items.GOLD_NUGGET, ModItems.SIFTITE_NUGGET);
+        check(CreativeModeTabs.FOOD_AND_DRINKS, Items.PORKCHOP, ModItems.RAW_SIFTER_MEAT);
+        check(CreativeModeTabs.FOOD_AND_DRINKS, Items.COOKED_PORKCHOP, ModItems.COOKED_SIFTER_MEAT);
+        check(CreativeModeTabs.SPAWN_EGGS, Items.BLAZE_SPAWN_EGG, BlubItems.BLUB_SPAWN_EGG);
+        check(CreativeModeTabs.SPAWN_EGGS, Items.COW_SPAWN_EGG, ModItems.DARK_SNIFFER_SPAWN_EGG);
+        check(CreativeModeTabs.SPAWN_EGGS, Items.DROWNED_SPAWN_EGG, ModItems.ECHO_GOLEM_SPAWN_EGG);
+        check(CreativeModeTabs.SPAWN_EGGS, Items.SHEEP_SPAWN_EGG, ModItems.SIFTER_SPAWN_EGG);
+        check(CreativeModeTabs.SPAWN_EGGS, Items.SILVERFISH_SPAWN_EGG, ModItems.SINGER_SPAWN_EGG);
         checkSonorousModes();
         auditActualTabs();
         System.out.println("SIFT_CREATIVE_TABS_PASS");
     }
 
-
-    /** Diagnostic: seed nothing; let Minecraft generate actual vanilla contents. */
+    /**
+     * Populate Minecraft's actual built-in tabs instead of seeding the anchor.
+     * This catches cases where Fabric silently appends entries because their
+     * expected anchor is absent. A small mock test alone cannot catch that.
+     */
     private static void auditActualTabs() {
         var groups = List.of(
             CreativeModeTabs.BUILDING_BLOCKS, CreativeModeTabs.NATURAL_BLOCKS,
@@ -69,48 +74,103 @@ public final class CreativeTabsCheck {
             CreativeModeTabs.TOOLS_AND_UTILITIES, CreativeModeTabs.COMBAT,
             CreativeModeTabs.FOOD_AND_DRINKS, CreativeModeTabs.INGREDIENTS,
             CreativeModeTabs.SPAWN_EGGS, ModItems.CREATIVE_TAB_KEY);
+        int actualGroupsChecked = 0;
         for (var key : groups) {
             try {
                 CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(key.location());
                 tab.buildContents(new CreativeModeTab.ItemDisplayParameters(
                     FeatureFlags.VANILLA_SET, true, RegistryAccess.EMPTY));
                 var stacks = List.copyOf(tab.getDisplayItems());
-                System.out.println("SIFT_REAL_TAB " + key.location() + " size=" + stacks.size()
-                    + " sift=" + stacks.stream().filter(v -> BuiltInRegistries.ITEM.getKey(v.getItem()).getNamespace().equals("the_sift")).count()
-                    + " vanilla=" + stacks.stream().filter(v -> BuiltInRegistries.ITEM.getKey(v.getItem()).getNamespace().equals("minecraft")).count());
+                long count = stacks.stream().filter(v -> BuiltInRegistries.ITEM.getKey(v.getItem())
+                    .getNamespace().equals("the_sift")).count();
+                System.out.println("SIFT_REAL_TAB " + key.location() + " size=" + stacks.size() + " sift=" + count);
                 if (key.equals(CreativeModeTabs.BUILDING_BLOCKS)) {
-                    report(stacks, Items.REINFORCED_DEEPSLATE);
-                    report(stacks, Items.MANGROVE_PLANKS);
+                    realAfter(key, stacks, Items.REINFORCED_DEEPSLATE, ModBlocks.REINFORCED_SIFTSLATE_ITEM);
+                    realAfter(key, stacks, Items.DEEPSLATE, ModBlocks.SIFTSLATE_ITEM, ModBlocks.COBBLED_SIFTSLATE_ITEM);
+                    realAfter(key, stacks, Items.MANGROVE_LOG, ModBlocks.OVERGROWN_WILLOW_LOG_ITEM);
+                    realAfter(key, stacks, Items.MANGROVE_PLANKS, ModBlocks.OVERGROWN_WILLOW_PLANKS_ITEM);
+                    realAfter(key, stacks, Items.MANGROVE_DOOR, ModBlocks.OVERGROWN_WILLOW_DOOR_ITEM);
+                    require(count >= 26, "Building blocks missing Sift items: " + count);
                 } else if (key.equals(CreativeModeTabs.NATURAL_BLOCKS)) {
-                    report(stacks, Items.DEEPSLATE_DIAMOND_ORE);
-                    report(stacks, Items.SCULK);
-                } else if (key.equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
-                    report(stacks, Items.CRAFTING_TABLE);
-                    report(stacks, Items.NOTE_BLOCK);
+                    realAfter(key, stacks, Items.SCULK, ModBlocks.SIFTSLATE_GROWTH_ITEM, ModBlocks.SIFT_RUBBLE_ITEM);
+                    realAfter(key, stacks, Items.MANGROVE_PROPAGULE, ModBlocks.OVERGROWN_WILLOW_SAPLING_ITEM);
+                    realAfter(key, stacks, Items.VINE, ModBlocks.OVERGROWN_WILLOW_VINES_ITEM);
+                    require(count >= 28, "Natural blocks missing Sift items: " + count);
+                } else if (key.equals(CreativeModeTabs.REDSTONE_BLOCKS)) {
+                    realAfter(key, stacks, Items.MANGROVE_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
+                    realAfter(key, stacks, Items.MANGROVE_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
+                    require(count >= 2, "Redstone tab missing Sift items");
                 } else if (key.equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
-                    report(stacks, Items.NETHERITE_PICKAXE);
-                    report(stacks, Items.MUSIC_DISC_OTHERSIDE);
-                    report(stacks, Items.ENDER_EYE);
+                    realAfter(key, stacks, Items.NETHERITE_PICKAXE, ModItems.SIFTITE_PICKAXE);
+                    realAfter(key, stacks, Items.MANGROVE_BOAT, ModItems.OVERGROWN_WILLOW_BOAT);
+                    realAfter(key, stacks, Items.MUSIC_DISC_PRECIPICE,
+                        ModItems.MUSIC_DISC_RIFT, ModItems.MUSIC_DISC_WELLSPRING);
+                    require(count >= 10, "Tools tab missing Sift items: " + count);
                 } else if (key.equals(CreativeModeTabs.COMBAT)) {
-                    report(stacks, Items.TRIDENT);
-                    report(stacks, BackportContent.SIFTITE_SPEAR);
+                    realAfter(key, stacks, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+                    realAfter(key, stacks, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
+                    require(count >= 7, "Combat tab missing Sift items: " + count);
+                } else if (key.equals(CreativeModeTabs.FOOD_AND_DRINKS)) {
+                    realAfter(key, stacks, Items.PORKCHOP, ModItems.RAW_SIFTER_MEAT);
+                    realAfter(key, stacks, Items.COOKED_PORKCHOP, ModItems.COOKED_SIFTER_MEAT);
+                    require(count >= 3, "Food tab missing Sift items: " + count);
+                } else if (key.equals(CreativeModeTabs.INGREDIENTS)) {
+                    realAfter(key, stacks, Items.NETHERITE_INGOT, ModItems.SIFTITE_INGOT);
+                    realAfter(key, stacks, Items.GOLD_NUGGET, ModItems.SIFTITE_NUGGET);
+                    require(count >= 5, "Ingredients tab missing Sift items: " + count);
                 } else if (key.equals(CreativeModeTabs.SPAWN_EGGS)) {
-                    report(stacks, Items.SNIFFER_SPAWN_EGG);
-                    report(stacks, ModItems.SINGER_SPAWN_EGG);
+                    realAfter(key, stacks, Items.BLAZE_SPAWN_EGG, BlubItems.BLUB_SPAWN_EGG);
+                    realAfter(key, stacks, Items.COW_SPAWN_EGG, ModItems.DARK_SNIFFER_SPAWN_EGG);
+                    realAfter(key, stacks, Items.DROWNED_SPAWN_EGG, ModItems.ECHO_GOLEM_SPAWN_EGG);
+                    realAfter(key, stacks, Items.SHEEP_SPAWN_EGG, ModItems.SIFTER_SPAWN_EGG);
+                    realAfter(key, stacks, Items.SILVERFISH_SPAWN_EGG, ModItems.SINGER_SPAWN_EGG);
+                    require(count == 5, "Spawn egg tab should include exactly five Sift eggs");
                 } else if (key.equals(ModItems.CREATIVE_TAB_KEY)) {
-                    report(stacks, ModItems.SIFTITE_SWORD);
-                    report(stacks, BackportContent.SIFTITE_SPEAR);
+                    realAfter(key, stacks, ModItems.SIFTITE_SWORD, BackportContent.SIFTITE_SPEAR);
+                    realAfter(key, stacks, ModBlocks.OVERGROWN_WILLOW_PLANKS_ITEM, BackportContent.SHELF_ITEM);
+                    require(count == 91, "Sift custom tab must keep all 91 entries: " + count);
+                    ordered(stacks, BlubItems.BLUB_SPAWN_EGG,
+                        ModItems.DARK_SNIFFER_SPAWN_EGG, ModItems.ECHO_GOLEM_SPAWN_EGG,
+                        ModItems.SIFTER_SPAWN_EGG, ModItems.SINGER_SPAWN_EGG);
                 }
-            } catch (Throwable e) {
-                System.out.println("SIFT_REAL_TAB_ERROR " + key.location() + " "
-                    + e.getClass().getSimpleName() + " " + e.getMessage());
+                actualGroupsChecked++;
+            } catch (IllegalStateException e) {
+                // At the title screen there is no synchronized banner-pattern
+                // registry. Functional Blocks is also covered via event tests.
+                if (key.equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                    && e.getMessage() != null && e.getMessage().contains("banner_pattern")) {
+                    System.out.println("SIFT_REAL_TAB_SKIPPED functional_blocks needs dynamic banner patterns");
+                } else {
+                    throw e;
+                }
             }
+        }
+        require(actualGroupsChecked == 9, "Expected 9 actual Minecraft creative tabs, got " + actualGroupsChecked);
+        System.out.println("SIFT_REAL_CREATIVE_TABS_PASS groups=" + actualGroupsChecked);
+    }
+
+    private static void realAfter(ResourceKey<CreativeModeTab> key, List<ItemStack> stacks,
+                                  ItemLike anchor, ItemLike... expected) {
+        int before = indexOf(stacks, anchor.asItem());
+        require(before >= 0, key.location() + ": real anchor absent: " + anchor.asItem());
+        for (int n = 0; n < expected.length; n++) {
+            Item item = expected[n].asItem();
+            int at = before + n + 1;
+            require(at < stacks.size() && stacks.get(at).is(item),
+                key.location() + ": wrong real sort at " + at + " after " + anchor.asItem()
+                + ", expected " + item);
+            require(stacks.stream().filter(s -> s.is(item)).count() == 1,
+                key.location() + ": duplicate real item " + item);
         }
     }
 
-    private static void report(List<ItemStack> list, ItemLike item) {
-        System.out.println("SIFT_REAL_ANCHOR " + BuiltInRegistries.ITEM.getKey(item.asItem())
-            + " at=" + indexOf(list, item.asItem()));
+    private static void ordered(List<ItemStack> stacks, ItemLike... items) {
+        int last = -1;
+        for (ItemLike item : items) {
+            int at = indexOf(stacks, item.asItem());
+            require(at > last, "Custom tab mob eggs not sorted: " + item.asItem());
+            last = at;
+        }
     }
 
     private static FabricItemGroupEntries entries(ResourceKey<CreativeModeTab> key, ItemLike anchor,

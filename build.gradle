@@ -1,5 +1,5 @@
 plugins { id 'fabric-loom' version '1.9.2' }
-version = '1.1.2-fabric-backport.7'
+version = '1.1.2-fabric-backport.8'
 group = 'mielon.thesift'
 base { archivesName = 'mielons-the-sift-1.21.1' }
 repositories { mavenCentral() }
