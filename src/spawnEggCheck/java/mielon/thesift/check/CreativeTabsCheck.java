@@ -45,7 +45,13 @@ public final class CreativeTabsCheck {
         check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
         check(CreativeModeTabs.COMBAT, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
-        check(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.NETHERITE_PICKAXE, ModItems.SIFTITE_PICKAXE);
+        check(CreativeModeTabs.COMBAT, Items.NETHERITE_AXE, ModItems.SIFTITE_AXE);
+        check(CreativeModeTabs.COMBAT, Items.NETHERITE_BOOTS,
+            ModItems.SIFTITE_HELMET, ModItems.SIFTITE_CHESTPLATE,
+            ModItems.SIFTITE_LEGGINGS, ModItems.SIFTITE_BOOTS);
+        check(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.NETHERITE_HOE,
+            ModItems.SIFTITE_SHOVEL, ModItems.SIFTITE_PICKAXE,
+            ModItems.SIFTITE_AXE, ModItems.SIFTITE_HOE);
         check(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.MUSIC_DISC_PRECIPICE,
             ModItems.MUSIC_DISC_RIFT, ModItems.MUSIC_DISC_WELLSPRING);
         check(CreativeModeTabs.INGREDIENTS, Items.NETHERITE_INGOT, ModItems.SIFTITE_INGOT);
@@ -84,20 +90,6 @@ public final class CreativeTabsCheck {
                 long count = stacks.stream().filter(v -> BuiltInRegistries.ITEM.getKey(v.getItem())
                     .getNamespace().equals("the_sift")).count();
                 System.out.println("SIFT_REAL_TAB " + key.location() + " size=" + stacks.size() + " sift=" + count);
-                if (key.equals(CreativeModeTabs.TOOLS_AND_UTILITIES)
-                    || key.equals(CreativeModeTabs.COMBAT)) {
-                    for (int i = 0; i < stacks.size(); i++) {
-                        String item = BuiltInRegistries.ITEM.getKey(stacks.get(i).getItem()).toString();
-                        if (item.contains("spear") || item.contains("sword") || item.contains("pickaxe")
-                            || item.contains("shovel") || item.endsWith("_axe") || item.contains("hoe")
-                            || item.contains("helmet") || item.contains("chestplate")
-                            || item.contains("leggings") || item.endsWith("_boots")
-                            || item.contains("trident") || item.contains("mace")) {
-                            System.out.println("SIFT_EQUIPMENT_ORDER " + key.location()
-                                + " #" + i + " " + item);
-                        }
-                    }
-                }
                 if (key.equals(CreativeModeTabs.BUILDING_BLOCKS)) {
                     realAfter(key, stacks, Items.REINFORCED_DEEPSLATE, ModBlocks.REINFORCED_SIFTSLATE_ITEM);
                     realAfter(key, stacks, Items.DEEPSLATE, ModBlocks.SIFTSLATE_ITEM, ModBlocks.COBBLED_SIFTSLATE_ITEM);
@@ -115,7 +107,9 @@ public final class CreativeTabsCheck {
                     realAfter(key, stacks, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
                     require(count >= 2, "Redstone tab missing Sift items");
                 } else if (key.equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
-                    realAfter(key, stacks, Items.NETHERITE_PICKAXE, ModItems.SIFTITE_PICKAXE);
+                    realAfter(key, stacks, Items.NETHERITE_HOE,
+                        ModItems.SIFTITE_SHOVEL, ModItems.SIFTITE_PICKAXE,
+                        ModItems.SIFTITE_AXE, ModItems.SIFTITE_HOE);
                     realAfter(key, stacks, Items.MANGROVE_BOAT, ModItems.OVERGROWN_WILLOW_BOAT);
                     realAfter(key, stacks, Items.MUSIC_DISC_PRECIPICE,
                         ModItems.MUSIC_DISC_RIFT, ModItems.MUSIC_DISC_WELLSPRING);
@@ -123,7 +117,11 @@ public final class CreativeTabsCheck {
                 } else if (key.equals(CreativeModeTabs.COMBAT)) {
                     realAfter(key, stacks, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
                     realAfter(key, stacks, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
-                    require(count >= 7, "Combat tab missing Sift items: " + count);
+                    realAfter(key, stacks, Items.NETHERITE_AXE, ModItems.SIFTITE_AXE);
+                    realAfter(key, stacks, Items.NETHERITE_BOOTS,
+                        ModItems.SIFTITE_HELMET, ModItems.SIFTITE_CHESTPLATE,
+                        ModItems.SIFTITE_LEGGINGS, ModItems.SIFTITE_BOOTS);
+                    require(count >= 8, "Combat tab missing Sift items: " + count);
                 } else if (key.equals(CreativeModeTabs.FOOD_AND_DRINKS)) {
                     realAfter(key, stacks, Items.PORKCHOP, ModItems.RAW_SIFTER_MEAT);
                     realAfter(key, stacks, Items.COOKED_PORKCHOP, ModItems.COOKED_SIFTER_MEAT);

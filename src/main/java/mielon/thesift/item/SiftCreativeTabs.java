@@ -170,10 +170,13 @@ public final class SiftCreativeTabs {
 
     private static void registerTools() {
         registerTab(CreativeModeTabs.TOOLS_AND_UTILITIES,
-                alongside(Items.NETHERITE_PICKAXE, ModItems.SIFTITE_PICKAXE),
-                alongside(Items.NETHERITE_AXE, ModItems.SIFTITE_AXE),
-                alongside(Items.NETHERITE_SHOVEL, ModItems.SIFTITE_SHOVEL),
-                alongside(Items.NETHERITE_HOE, ModItems.SIFTITE_HOE),
+                // Like vanilla, display a complete tool tier: shovel,
+                // pickaxe, axe, hoe. Never interleave it with Netherite.
+                alongside(Items.NETHERITE_HOE,
+                        ModItems.SIFTITE_SHOVEL,
+                        ModItems.SIFTITE_PICKAXE,
+                        ModItems.SIFTITE_AXE,
+                        ModItems.SIFTITE_HOE),
                 alongside(Items.MANGROVE_BOAT, ModItems.OVERGROWN_WILLOW_BOAT),
                 alongside(Items.MANGROVE_CHEST_BOAT, ModItems.OVERGROWN_WILLOW_CHEST_BOAT),
                 alongside(Items.WATER_BUCKET, ModFluids.ICHOR_BUCKET),
@@ -184,10 +187,15 @@ public final class SiftCreativeTabs {
     private static void registerCombat() {
         registerTab(CreativeModeTabs.COMBAT,
                 alongside(Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD),
-                alongside(Items.NETHERITE_HELMET, ModItems.SIFTITE_HELMET),
-                alongside(Items.NETHERITE_CHESTPLATE, ModItems.SIFTITE_CHESTPLATE),
-                alongside(Items.NETHERITE_LEGGINGS, ModItems.SIFTITE_LEGGINGS),
-                alongside(Items.NETHERITE_BOOTS, ModItems.SIFTITE_BOOTS),
+                // Vanilla combat includes axes as melee weapons too.
+                alongside(Items.NETHERITE_AXE, ModItems.SIFTITE_AXE),
+                // Armor is grouped into complete material sets, not
+                // interleaved by equipment slot.
+                alongside(Items.NETHERITE_BOOTS,
+                        ModItems.SIFTITE_HELMET,
+                        ModItems.SIFTITE_CHESTPLATE,
+                        ModItems.SIFTITE_LEGGINGS,
+                        ModItems.SIFTITE_BOOTS),
                 alongside(Items.SNOWBALL, ModItems.ICHOR_SNOWBALL));
 
         // VanillaBackport may add the modern Netherite Spear to 1.21.1.
