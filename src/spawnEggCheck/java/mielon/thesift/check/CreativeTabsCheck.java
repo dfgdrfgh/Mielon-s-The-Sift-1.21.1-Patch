@@ -43,7 +43,7 @@ public final class CreativeTabsCheck {
         check(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.MANGROVE_SIGN, ModBlocks.OVERGROWN_WILLOW_SIGN_ITEM);
         check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
         check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
-        checkBefore(CreativeModeTabs.COMBAT, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+        checkBefore(CreativeModeTabs.COMBAT, Items.WOODEN_AXE, BackportContent.SIFTITE_SPEAR);
         checkSpearOrderAfterLateBackportInsert();
         checkSpearOrderWithoutAllEntriesEvent();
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
@@ -117,7 +117,7 @@ public final class CreativeTabsCheck {
                         ModItems.MUSIC_DISC_RIFT, ModItems.MUSIC_DISC_WELLSPRING);
                     require(count >= 10, "Tools tab missing Sift items: " + count);
                 } else if (key.equals(CreativeModeTabs.COMBAT)) {
-                    realBefore(key, stacks, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+                    realBefore(key, stacks, Items.WOODEN_AXE, BackportContent.SIFTITE_SPEAR);
                     realAfter(key, stacks, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
                     realAfter(key, stacks, Items.NETHERITE_AXE, ModItems.SIFTITE_AXE);
                     realAfter(key, stacks, Items.NETHERITE_BOOTS,
@@ -164,51 +164,61 @@ public final class CreativeTabsCheck {
     }
 
     private static void checkSpearOrderWithoutAllEntriesEvent() {
-        // Verify the original failure mode: just the regular Combat event
-        // must never leave the spear missing or appended far from Trident.
+        // Regression for the screenshot: Siftite must precede the FIRST axe,
+        // not the Trident which comes after the entire axe row.
         var display = new ArrayList<ItemStack>();
         var search = new ArrayList<ItemStack>();
+        display.add(new ItemStack(Items.NETHERITE_SWORD));
+        display.add(new ItemStack(Items.WOODEN_AXE));
         display.add(new ItemStack(Items.TRIDENT));
-        search.add(new ItemStack(Items.TRIDENT));
+        for (ItemStack stack : display) search.add(stack.copy());
         var entries = new FabricItemGroupEntries(
             new CreativeModeTab.ItemDisplayParameters(FeatureFlags.VANILLA_SET, true, RegistryAccess.EMPTY),
             display, search);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).invoker().modifyEntries(entries);
-        require(display.size() >= 2 && display.get(0).is(BackportContent.SIFTITE_SPEAR)
-                && display.get(1).is(Items.TRIDENT),
-            "Siftite Spear is missing unless the ALL event also executes");
+        int axe = indexOf(display, Items.WOODEN_AXE);
+        require(axe > 0 && display.get(axe - 1).is(BackportContent.SIFTITE_SPEAR),
+            "Without ALL callback, Siftite must be immediately before the first axe");
         require(search.stream().filter(s -> s.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
-            "Siftite Spear missing from search before the ALL event");
+            "Siftite Spear missing from search before ALL event");
         System.out.println("SIFT_SPEAR_COMBAT_EVENT_PASS");
     }
 
     private static void checkSpearOrderAfterLateBackportInsert() {
-        // Simulate VanillaBackport's seven spear entries becoming available
-        // AFTER the Sift's specific Combat tab callback, but BEFORE the
-        // Fabric all-tabs callback. We use a vanilla item as a mock spear,
-        // without adding VanillaBackport as a compile-time dependency.
+        // Recreate the actual VB+Sift tab layout. VanillaBackport inserts
+        // the seven spears BEFORE WOODEN_AXE, whereas Trident is after axes.
+        // Insert all seven stand-ins LATE to catch the original bug.
         var display = new ArrayList<ItemStack>();
         var search = new ArrayList<ItemStack>();
+        display.add(new ItemStack(Items.NETHERITE_SWORD));
+        display.add(new ItemStack(Items.WOODEN_AXE));
+        display.add(new ItemStack(Items.STONE_AXE));
         display.add(new ItemStack(Items.TRIDENT));
-        search.add(new ItemStack(Items.TRIDENT));
+        for (ItemStack stack : display) search.add(stack.copy());
         var entries = new FabricItemGroupEntries(
             new CreativeModeTab.ItemDisplayParameters(FeatureFlags.VANILLA_SET, true, RegistryAccess.EMPTY),
             display, search);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).invoker().modifyEntries(entries);
-        entries.addBefore(Items.TRIDENT, Items.NETHERITE_INGOT);
+        var standIns = List.of(Items.WOODEN_SHOVEL, Items.STONE_SHOVEL, Items.IRON_SHOVEL,
+            Items.GOLDEN_SHOVEL, Items.DIAMOND_SHOVEL, Items.NETHERITE_SHOVEL, Items.NETHERITE_PICKAXE);
+        for (Item mockSpear : standIns) {
+            entries.addBefore(Items.WOODEN_AXE, mockSpear);
+        }
         ItemGroupEvents.MODIFY_ENTRIES_ALL.invoker().modifyEntries(
             BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.COMBAT.location()), entries);
-        int anchor = indexOf(display, Items.TRIDENT);
-        require(anchor >= 2, "Mock backport spear row has insufficient space");
-        require(display.get(anchor - 2).is(Items.NETHERITE_INGOT),
-            "Late backport spear item must precede Siftite Spear");
-        require(display.get(anchor - 1).is(BackportContent.SIFTITE_SPEAR),
-            "Siftite Spear must follow backported spears and precede Trident");
-        require(display.stream().filter(v -> v.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
-            "Siftite Spear duplicated in Combat display after late backport insertion");
-        require(search.stream().filter(v -> v.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
-            "Siftite Spear missing or duplicated in search after late backport insertion");
-        System.out.println("SIFT_LATE_BACKPORT_SPEAR_ORDER_PASS");
+        int axe = indexOf(display, Items.WOODEN_AXE);
+        require(axe == 9, "Unexpected mock spear row length " + axe);
+        require(display.get(axe - 2).is(Items.NETHERITE_PICKAXE),
+            "VanillaBackport final spear stand-in must come first");
+        require(display.get(axe - 1).is(BackportContent.SIFTITE_SPEAR),
+            "Siftite must be after seven VanillaBackport spears and before axes");
+        require(indexOf(display, Items.TRIDENT) > axe,
+            "Trident should follow the axes, not act as the spear anchor");
+        require(display.stream().filter(s -> s.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
+            "Siftite Spear duplicated in Combat display");
+        require(search.stream().filter(s -> s.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
+            "Siftite Spear missing or duplicated in Search");
+        System.out.println("SIFT_VANILLABACKPORT_AXE_BOUNDARY_PASS");
     }
 
     private static void checkBefore(ResourceKey<CreativeModeTab> tab, ItemLike anchor, ItemLike item) {

@@ -60,14 +60,16 @@ final class SiftEquipmentCreativeTabs {
         entries.addAfter(ModItems.SIFTITE_LEGGINGS, ModItems.SIFTITE_BOOTS);
 
         entries.addAfter(Items.SNOWBALL, ModItems.ICHOR_SNOWBALL);
-        entries.addBefore(Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+        // VanillaBackport inserts all seven spears before the first axe.
+        // Put Siftite at the same boundary, not near the Trident.
+        entries.addBefore(Items.WOODEN_AXE, BackportContent.SIFTITE_SPEAR);
     }
 
     /**
-     * Some mods insert their entire spear line before Trident after our own
-     * Combat event. The late pass is deliberately idempotent: it removes any
-     * preliminary Siftite copy from both lists and reinserts exactly once at
-     * the end of the spear line, immediately before Trident.
+     * VanillaBackport inserts its seven spears before Wooden Axe, ahead of
+     * the vanilla axe group. The late pass moves Siftite to exactly that
+     * boundary, even if other tab listeners registered their spears later.
+     * Rebuilding both lists keeps the operation idempotent.
      */
     private static void positionSiftiteSpear(FabricItemGroupEntries entries) {
         List<ItemStack> display = entries.getDisplayStacks();
@@ -75,19 +77,18 @@ final class SiftEquipmentCreativeTabs {
         display.removeIf(stack -> stack.is(BackportContent.SIFTITE_SPEAR));
         search.removeIf(stack -> stack.is(BackportContent.SIFTITE_SPEAR));
 
-        int tridentIndex = -1;
+        int axeIndex = -1;
         for (int i = 0; i < display.size(); i++) {
-            if (display.get(i).is(Items.TRIDENT)) {
-                tridentIndex = i;
+            if (display.get(i).is(Items.WOODEN_AXE)) {
+                axeIndex = i;
                 break;
             }
         }
-        // Trident is a vanilla Combat item. If an incompatible mod removes
-        // it, retain access to Siftite Spear instead of silently losing it.
-        if (tridentIndex == -1) {
-            tridentIndex = display.size();
+        // Keep the spear discoverable if another mod hides the vanilla axe.
+        if (axeIndex < 0) {
+            axeIndex = display.size();
         }
-        display.add(tridentIndex, new ItemStack(BackportContent.SIFTITE_SPEAR));
+        display.add(axeIndex, new ItemStack(BackportContent.SIFTITE_SPEAR));
         search.add(new ItemStack(BackportContent.SIFTITE_SPEAR));
     }
 }
