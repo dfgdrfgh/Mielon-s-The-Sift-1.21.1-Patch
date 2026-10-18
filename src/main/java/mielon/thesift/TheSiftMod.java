@@ -77,6 +77,7 @@ implements ModInitializer {
         ModItems.initialize();
         BlubItems.initialize();
         mielon.thesift.backport.BackportContent.initialize();
+        mielon.thesift.item.SiftCreativeTabs.register();
         ModAdvancements.register();
         SiftiteRecoveryManager.register();
         RiftLoadingPayload.register();

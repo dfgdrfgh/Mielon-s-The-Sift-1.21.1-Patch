@@ -26,5 +26,5 @@ public final class BackportContent {
  public static final SoundEvent[] LUNGE_SOUNDS={sound("lunge_1"),sound("lunge_2"),sound("lunge_3")};
  public static ResourceLocation id(String name){return ResourceLocation.fromNamespaceAndPath("the_sift",name);}
  private static SoundEvent sound(String name){return Registry.register(BuiltInRegistries.SOUND_EVENT,id("backport.spear_"+name),SoundEvent.createVariableRangeEvent(id("backport.spear_"+name)));}
- public static void initialize(){FlammableBlockRegistry.getDefaultInstance().add(SHELF,5,20);ItemGroupEvents.modifyEntriesEvent(ModItems.CREATIVE_TAB_KEY).register(entries->{entries.accept(SHELF_ITEM);SPEARS.forEach(entries::accept);});SpearAttackPayload.register();}
+ public static void initialize(){FlammableBlockRegistry.getDefaultInstance().add(SHELF,5,20);SpearAttackPayload.register();}
 }
