@@ -112,8 +112,10 @@ public final class SiftCreativeTabs {
         });
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
-            after(entries, Items.MANGROVE_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
-            after(entries, Items.MANGROVE_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
+            // Vanilla's Redstone tab only contains the representative Oak
+            // wood variants, not all wood types.
+            after(entries, Items.OAK_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
+            after(entries, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
         });
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {

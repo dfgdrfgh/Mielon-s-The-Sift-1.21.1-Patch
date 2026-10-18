@@ -41,8 +41,8 @@ public final class CreativeTabsCheck {
         check(CreativeModeTabs.NATURAL_BLOCKS, Items.SCULK, ModBlocks.SIFTSLATE_GROWTH_ITEM, ModBlocks.SIFT_RUBBLE_ITEM);
         check(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.CHISELED_BOOKSHELF, BackportContent.SHELF_ITEM);
         check(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.MANGROVE_SIGN, ModBlocks.OVERGROWN_WILLOW_SIGN_ITEM);
-        check(CreativeModeTabs.REDSTONE_BLOCKS, Items.MANGROVE_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
-        check(CreativeModeTabs.REDSTONE_BLOCKS, Items.MANGROVE_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
+        check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
+        check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
         check(CreativeModeTabs.COMBAT, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
         check(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.NETHERITE_PICKAXE, ModItems.SIFTITE_PICKAXE);
@@ -97,8 +97,8 @@ public final class CreativeTabsCheck {
                     realAfter(key, stacks, Items.VINE, ModBlocks.OVERGROWN_WILLOW_VINES_ITEM);
                     require(count >= 28, "Natural blocks missing Sift items: " + count);
                 } else if (key.equals(CreativeModeTabs.REDSTONE_BLOCKS)) {
-                    realAfter(key, stacks, Items.MANGROVE_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
-                    realAfter(key, stacks, Items.MANGROVE_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
+                    realAfter(key, stacks, Items.OAK_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
+                    realAfter(key, stacks, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
                     require(count >= 2, "Redstone tab missing Sift items");
                 } else if (key.equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
                     realAfter(key, stacks, Items.NETHERITE_PICKAXE, ModItems.SIFTITE_PICKAXE);
