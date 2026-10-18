@@ -6,16 +6,11 @@ import java.util.Map;
 import mielon.thesift.backport.BackportContent;
 import mielon.thesift.block.ModBlocks;
 import mielon.thesift.block.SonorousDeepslateBlock;
-import mielon.thesift.fluid.ModFluids;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.BlockItemStateProperties;
@@ -60,8 +55,7 @@ public final class SiftCreativeTabs {
         registerNatural();
         registerFunctional();
         registerRedstone();
-        registerTools();
-        registerCombat();
+        SiftEquipmentCreativeTabs.register();
         registerFood();
         registerIngredients();
         registerEggs();
@@ -166,49 +160,6 @@ public final class SiftCreativeTabs {
         registerTab(CreativeModeTabs.REDSTONE_BLOCKS,
                 alongside(Items.OAK_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM),
                 alongside(Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM));
-    }
-
-    private static void registerTools() {
-        registerTab(CreativeModeTabs.TOOLS_AND_UTILITIES,
-                // Like vanilla, display a complete tool tier: shovel,
-                // pickaxe, axe, hoe. Never interleave it with Netherite.
-                alongside(Items.NETHERITE_HOE,
-                        ModItems.SIFTITE_SHOVEL,
-                        ModItems.SIFTITE_PICKAXE,
-                        ModItems.SIFTITE_AXE,
-                        ModItems.SIFTITE_HOE),
-                alongside(Items.MANGROVE_BOAT, ModItems.OVERGROWN_WILLOW_BOAT),
-                alongside(Items.MANGROVE_CHEST_BOAT, ModItems.OVERGROWN_WILLOW_CHEST_BOAT),
-                alongside(Items.WATER_BUCKET, ModFluids.ICHOR_BUCKET),
-                alongside(Items.MUSIC_DISC_PRECIPICE, ModItems.MUSIC_DISC_RIFT, ModItems.MUSIC_DISC_WELLSPRING),
-                alongside(Items.ENDER_EYE, ModItems.SIFT_RIFT));
-    }
-
-    private static void registerCombat() {
-        registerTab(CreativeModeTabs.COMBAT,
-                alongside(Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD),
-                // Vanilla combat includes axes as melee weapons too.
-                alongside(Items.NETHERITE_AXE, ModItems.SIFTITE_AXE),
-                // Armor is grouped into complete material sets, not
-                // interleaved by equipment slot.
-                alongside(Items.NETHERITE_BOOTS,
-                        ModItems.SIFTITE_HELMET,
-                        ModItems.SIFTITE_CHESTPLATE,
-                        ModItems.SIFTITE_LEGGINGS,
-                        ModItems.SIFTITE_BOOTS),
-                alongside(Items.SNOWBALL, ModItems.ICHOR_SNOWBALL));
-
-        // VanillaBackport may add the modern Netherite Spear to 1.21.1.
-        // Base 1.21.1 has no spears, so place ours after the Trident there.
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).register(SiftCreativeTabs::insertSpear);
-    }
-
-    private static void insertSpear(FabricItemGroupEntries entries) {
-        Item netherite = BuiltInRegistries.ITEM.get(
-                ResourceLocation.withDefaultNamespace("netherite_spear"));
-        boolean present = netherite != Items.AIR
-                && entries.getDisplayStacks().stream().anyMatch(stack -> stack.is(netherite));
-        entries.addAfter(present ? netherite : Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
     }
 
     private static void registerFood() {
