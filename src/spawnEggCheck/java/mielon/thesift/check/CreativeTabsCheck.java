@@ -84,6 +84,20 @@ public final class CreativeTabsCheck {
                 long count = stacks.stream().filter(v -> BuiltInRegistries.ITEM.getKey(v.getItem())
                     .getNamespace().equals("the_sift")).count();
                 System.out.println("SIFT_REAL_TAB " + key.location() + " size=" + stacks.size() + " sift=" + count);
+                if (key.equals(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                    || key.equals(CreativeModeTabs.COMBAT)) {
+                    for (int i = 0; i < stacks.size(); i++) {
+                        String item = BuiltInRegistries.ITEM.getKey(stacks.get(i).getItem()).toString();
+                        if (item.contains("spear") || item.contains("sword") || item.contains("pickaxe")
+                            || item.contains("shovel") || item.endsWith("_axe") || item.contains("hoe")
+                            || item.contains("helmet") || item.contains("chestplate")
+                            || item.contains("leggings") || item.endsWith("_boots")
+                            || item.contains("trident") || item.contains("mace")) {
+                            System.out.println("SIFT_EQUIPMENT_ORDER " + key.location()
+                                + " #" + i + " " + item);
+                        }
+                    }
+                }
                 if (key.equals(CreativeModeTabs.BUILDING_BLOCKS)) {
                     realAfter(key, stacks, Items.REINFORCED_DEEPSLATE, ModBlocks.REINFORCED_SIFTSLATE_ITEM);
                     realAfter(key, stacks, Items.DEEPSLATE, ModBlocks.SIFTSLATE_ITEM, ModBlocks.COBBLED_SIFTSLATE_ITEM);
