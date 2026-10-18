@@ -10,6 +10,7 @@ import mielon.thesift.item.ModItems;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlags;
@@ -55,7 +56,61 @@ public final class CreativeTabsCheck {
             ModItems.DARK_SNIFFER_SPAWN_EGG, BlubItems.BLUB_SPAWN_EGG,
             ModItems.SIFTER_SPAWN_EGG);
         checkSonorousModes();
+        auditActualTabs();
         System.out.println("SIFT_CREATIVE_TABS_PASS");
+    }
+
+
+    /** Diagnostic: seed nothing; let Minecraft generate actual vanilla contents. */
+    private static void auditActualTabs() {
+        var groups = List.of(
+            CreativeModeTabs.BUILDING_BLOCKS, CreativeModeTabs.NATURAL_BLOCKS,
+            CreativeModeTabs.FUNCTIONAL_BLOCKS, CreativeModeTabs.REDSTONE_BLOCKS,
+            CreativeModeTabs.TOOLS_AND_UTILITIES, CreativeModeTabs.COMBAT,
+            CreativeModeTabs.FOOD_AND_DRINKS, CreativeModeTabs.INGREDIENTS,
+            CreativeModeTabs.SPAWN_EGGS, ModItems.CREATIVE_TAB_KEY);
+        for (var key : groups) {
+            try {
+                CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(key.location());
+                tab.buildContents(new CreativeModeTab.ItemDisplayParameters(
+                    FeatureFlags.VANILLA_SET, true, RegistryAccess.EMPTY));
+                var stacks = List.copyOf(tab.getDisplayItems());
+                System.out.println("SIFT_REAL_TAB " + key.location() + " size=" + stacks.size()
+                    + " sift=" + stacks.stream().filter(v -> BuiltInRegistries.ITEM.getKey(v.getItem()).getNamespace().equals("the_sift")).count()
+                    + " vanilla=" + stacks.stream().filter(v -> BuiltInRegistries.ITEM.getKey(v.getItem()).getNamespace().equals("minecraft")).count());
+                if (key.equals(CreativeModeTabs.BUILDING_BLOCKS)) {
+                    report(stacks, Items.REINFORCED_DEEPSLATE);
+                    report(stacks, Items.MANGROVE_PLANKS);
+                } else if (key.equals(CreativeModeTabs.NATURAL_BLOCKS)) {
+                    report(stacks, Items.DEEPSLATE_DIAMOND_ORE);
+                    report(stacks, Items.SCULK);
+                } else if (key.equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
+                    report(stacks, Items.CRAFTING_TABLE);
+                    report(stacks, Items.NOTE_BLOCK);
+                } else if (key.equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
+                    report(stacks, Items.NETHERITE_PICKAXE);
+                    report(stacks, Items.MUSIC_DISC_OTHERSIDE);
+                    report(stacks, Items.ENDER_EYE);
+                } else if (key.equals(CreativeModeTabs.COMBAT)) {
+                    report(stacks, Items.TRIDENT);
+                    report(stacks, BackportContent.SIFTITE_SPEAR);
+                } else if (key.equals(CreativeModeTabs.SPAWN_EGGS)) {
+                    report(stacks, Items.SNIFFER_SPAWN_EGG);
+                    report(stacks, ModItems.SINGER_SPAWN_EGG);
+                } else if (key.equals(ModItems.CREATIVE_TAB_KEY)) {
+                    report(stacks, ModItems.SIFTITE_SWORD);
+                    report(stacks, BackportContent.SIFTITE_SPEAR);
+                }
+            } catch (Throwable e) {
+                System.out.println("SIFT_REAL_TAB_ERROR " + key.location() + " "
+                    + e.getClass().getSimpleName() + " " + e.getMessage());
+            }
+        }
+    }
+
+    private static void report(List<ItemStack> list, ItemLike item) {
+        System.out.println("SIFT_REAL_ANCHOR " + BuiltInRegistries.ITEM.getKey(item.asItem())
+            + " at=" + indexOf(list, item.asItem()));
     }
 
     private static FabricItemGroupEntries entries(ResourceKey<CreativeModeTab> key, ItemLike anchor,
