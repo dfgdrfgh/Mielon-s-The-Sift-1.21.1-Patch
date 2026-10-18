@@ -25,8 +25,10 @@ public final class SpawnEggRenderCheck implements ClientModInitializer {
             checked=true;
             try {
                 WeatherIsolationCheck.run(client);
+                CreativeTabsCheck.run();
                 run(client);
                 Files.writeString(Path.of("spawn-eggs-pass.txt"),"All five sprites, tint providers, generated outlines, hand transforms and advancement overrides passed.\n");
+                Files.writeString(Path.of("creative-tabs-pass.txt"),"Creative tab and search placements, custom tab spear/shelf ordering, and Sonorous variants passed.\n");
                 System.out.println("SIFT_SPAWN_EGGS_RENDER_PASS");
                 client.stop();
             } catch (Throwable failure) {
