@@ -207,7 +207,11 @@ public final class CreativeTabsCheck {
         ItemGroupEvents.MODIFY_ENTRIES_ALL.invoker().modifyEntries(
             BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.COMBAT.location()), entries);
         int axe = indexOf(display, Items.WOODEN_AXE);
-        require(axe == 9, "Unexpected mock spear row length " + axe);
+        require(axe >= 9, "Seven stand-in spears and Siftite must precede Wooden Axe: " + axe);
+        for (int n = 0; n < standIns.size(); n++) {
+            require(display.get(axe - 1 - standIns.size() + n).is(standIns.get(n)),
+                "Backported spear stand-in order is incorrect at " + n);
+        }
         require(display.get(axe - 2).is(Items.NETHERITE_PICKAXE),
             "VanillaBackport final spear stand-in must come first");
         require(display.get(axe - 1).is(BackportContent.SIFTITE_SPEAR),
