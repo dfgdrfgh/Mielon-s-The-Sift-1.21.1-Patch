@@ -1,0 +1,67 @@
+name: Compare v9 and v10 with ClamAV
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/sift-jar-security-review.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Download accepted v9 build from original run
+        uses: actions/download-artifact@v4
+        with:
+          name: Mielons-The-Sift-Fabric-1.21.1
+          run-id: 39094310271
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: samples/v9
+
+      - name: Download flagged v10 build from original run
+        uses: actions/download-artifact@v4
+        with:
+          name: Mielons-The-Sift-Fabric-1.21.1
+          run-id: 39095767477
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: samples/v10
+
+      - name: Verify original published JAR hashes
+        shell: bash
+        run: |
+          echo "a631bd40efc4f2a861f70026ea4af7bfcbe0652053fd152d512fcf05ed7e34d1  samples/v9/mielons-the-sift-1.21.1-1.1.2-fabric-backport.9.jar" | sha256sum -c -
+          echo "284e99c3d695b15126d23a9bdc51bcd3d342b01ec34d1bf0fdf272d3e8bfde26  samples/v10/mielons-the-sift-1.21.1-1.1.2-fabric-backport.10.jar" | sha256sum -c -
+
+      - name: Install ClamAV malware scanner
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y clamav clamav-freshclam
+          sudo systemctl stop clamav-freshclam 2>/dev/null || true
+          sudo freshclam --stdout
+          clamscan --version
+
+      - name: Independently scan each release JAR
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p results
+          for version in 9 10; do
+            echo "=== ClamAV scan of The Sift v$version ==="
+            clamscan --recursive --scan-archive=yes --infected --max-filesize=50M --max-scansize=500M \
+              "samples/v$version" | tee "results/clamav-v$version.txt"
+          done
+
+      - name: Preserve antivirus scan logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: the-sift-independent-antivirus-review
+          path: results/
+          if-no-files-found: ignore
+          retention-days: 30
