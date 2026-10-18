@@ -43,7 +43,8 @@ public final class CreativeTabsCheck {
         check(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.MANGROVE_SIGN, ModBlocks.OVERGROWN_WILLOW_SIGN_ITEM);
         check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_PRESSURE_PLATE, ModBlocks.OVERGROWN_WILLOW_PRESSURE_PLATE_ITEM);
         check(CreativeModeTabs.REDSTONE_BLOCKS, Items.OAK_BUTTON, ModBlocks.OVERGROWN_WILLOW_BUTTON_ITEM);
-        check(CreativeModeTabs.COMBAT, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+        checkBefore(CreativeModeTabs.COMBAT, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+        checkSpearOrderAfterLateBackportInsert();
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_AXE, ModItems.SIFTITE_AXE);
         check(CreativeModeTabs.COMBAT, Items.NETHERITE_BOOTS,
@@ -115,7 +116,7 @@ public final class CreativeTabsCheck {
                         ModItems.MUSIC_DISC_RIFT, ModItems.MUSIC_DISC_WELLSPRING);
                     require(count >= 10, "Tools tab missing Sift items: " + count);
                 } else if (key.equals(CreativeModeTabs.COMBAT)) {
-                    realAfter(key, stacks, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+                    realBefore(key, stacks, Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
                     realAfter(key, stacks, Items.NETHERITE_SWORD, ModItems.SIFTITE_SWORD);
                     realAfter(key, stacks, Items.NETHERITE_AXE, ModItems.SIFTITE_AXE);
                     realAfter(key, stacks, Items.NETHERITE_BOOTS,
@@ -161,6 +162,55 @@ public final class CreativeTabsCheck {
         System.out.println("SIFT_REAL_CREATIVE_TABS_PASS groups=" + actualGroupsChecked);
     }
 
+    private static void checkSpearOrderAfterLateBackportInsert() {
+        // Simulate VanillaBackport's seven spear entries becoming available
+        // AFTER the Sift's specific Combat tab callback, but BEFORE the
+        // Fabric all-tabs callback. We use a vanilla item as a mock spear,
+        // without adding VanillaBackport as a compile-time dependency.
+        var display = new ArrayList<ItemStack>();
+        var search = new ArrayList<ItemStack>();
+        display.add(new ItemStack(Items.TRIDENT));
+        search.add(new ItemStack(Items.TRIDENT));
+        var entries = new FabricItemGroupEntries(
+            new CreativeModeTab.ItemDisplayParameters(FeatureFlags.VANILLA_SET, true, RegistryAccess.EMPTY),
+            display, search);
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).invoker().modifyEntries(entries);
+        entries.addBefore(Items.TRIDENT, Items.NETHERITE_INGOT);
+        ItemGroupEvents.MODIFY_ENTRIES_ALL.invoker().modifyEntries(
+            BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.COMBAT.location()), entries);
+        int anchor = indexOf(display, Items.TRIDENT);
+        require(anchor >= 2, "Mock backport spear row has insufficient space");
+        require(display.get(anchor - 2).is(Items.NETHERITE_INGOT),
+            "Late backport spear item must precede Siftite Spear");
+        require(display.get(anchor - 1).is(BackportContent.SIFTITE_SPEAR),
+            "Siftite Spear must follow backported spears and precede Trident");
+        require(search.stream().filter(v -> v.is(BackportContent.SIFTITE_SPEAR)).count() == 1,
+            "Siftite Spear missing or duplicated in search after late backport insertion");
+        System.out.println("SIFT_LATE_BACKPORT_SPEAR_ORDER_PASS");
+    }
+
+    private static void checkBefore(ResourceKey<CreativeModeTab> tab, ItemLike anchor, ItemLike item) {
+        var display = new ArrayList<ItemStack>();
+        var search = new ArrayList<ItemStack>();
+        entries(tab, anchor, display, search);
+        int anchorIndex = indexOf(display, anchor.asItem());
+        require(anchorIndex > 0 && display.get(anchorIndex - 1).is(item.asItem()),
+            tab.location() + ": " + item.asItem() + " must be directly before " + anchor.asItem());
+        require(display.stream().filter(v -> v.is(item.asItem())).count() == 1,
+            tab.location() + ": duplicate " + item.asItem());
+        require(search.stream().filter(v -> v.is(item.asItem())).count() == 1,
+            tab.location() + ": missing or duplicate search item " + item.asItem());
+    }
+
+    private static void realBefore(ResourceKey<CreativeModeTab> tab, List<ItemStack> stacks,
+                                   ItemLike anchor, ItemLike item) {
+        int anchorIndex = indexOf(stacks, anchor.asItem());
+        require(anchorIndex > 0 && stacks.get(anchorIndex - 1).is(item.asItem()),
+            tab.location() + ": real spear placement must precede " + anchor.asItem());
+        require(stacks.stream().filter(v -> v.is(item.asItem())).count() == 1,
+            tab.location() + ": real spear duplicated");
+    }
+
     private static void realAfter(ResourceKey<CreativeModeTab> key, List<ItemStack> stacks,
                                   ItemLike anchor, ItemLike... expected) {
         int before = indexOf(stacks, anchor.asItem());
@@ -193,6 +243,8 @@ public final class CreativeTabsCheck {
             new CreativeModeTab.ItemDisplayParameters(FeatureFlags.VANILLA_SET, true, RegistryAccess.EMPTY),
             display, search);
         ItemGroupEvents.modifyEntriesEvent(key).invoker().modifyEntries(entries);
+        ItemGroupEvents.MODIFY_ENTRIES_ALL.invoker().modifyEntries(
+            BuiltInRegistries.CREATIVE_MODE_TAB.get(key.location()), entries);
         return entries;
     }
 

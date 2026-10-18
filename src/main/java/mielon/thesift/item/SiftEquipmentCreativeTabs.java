@@ -5,10 +5,7 @@ import mielon.thesift.fluid.ModFluids;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
@@ -24,6 +21,14 @@ final class SiftEquipmentCreativeTabs {
                 .register(SiftEquipmentCreativeTabs::populateTools);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT)
                 .register(SiftEquipmentCreativeTabs::populateCombat);
+        // All-tabs callbacks run AFTER the specific tab's additions. This
+        // means VanillaBackport's spear row has already been inserted before
+        // the Trident when we place the Siftite spear at its end.
+        ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> {
+            if (tab == BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.COMBAT.location())) {
+                entries.addBefore(Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
+            }
+        });
     }
 
     private static void populateTools(FabricItemGroupEntries entries) {
@@ -53,23 +58,6 @@ final class SiftEquipmentCreativeTabs {
 
         entries.addAfter(Items.SNOWBALL, ModItems.ICHOR_SNOWBALL);
 
-        // VanillaBackport can supply Netherite Spear on 1.21.1.
-        Item spear = BuiltInRegistries.ITEM.get(
-                ResourceLocation.withDefaultNamespace("netherite_spear"));
-        boolean hasSpear = spear != Items.AIR;
-        if (hasSpear) {
-            hasSpear = false;
-            for (ItemStack stack : entries.getDisplayStacks()) {
-                if (stack.is(spear)) {
-                    hasSpear = true;
-                    break;
-                }
-            }
-        }
-        if (hasSpear) {
-            entries.addAfter(spear, BackportContent.SIFTITE_SPEAR);
-        } else {
-            entries.addAfter(Items.TRIDENT, BackportContent.SIFTITE_SPEAR);
-        }
+
     }
 }
