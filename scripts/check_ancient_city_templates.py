@@ -39,6 +39,8 @@ class NBT:
             inner = self.unpack("B")
             length = self.unpack("i")
             assert length >= 0
+            if inner == 0 and length == 0:
+                return []  # NBT permits TAG_End as the element type of an empty list
             return [self.payload(inner) for _ in range(length)]
         if tag == 10:
             contents = {}
