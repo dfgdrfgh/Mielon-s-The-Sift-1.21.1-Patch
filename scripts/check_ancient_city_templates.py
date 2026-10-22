@@ -48,7 +48,8 @@ class NBT:
                 inner = self.unpack("B")
                 if inner == 0:
                     return contents
-                contents[self.string()] = self.payload(inner)
+                key = self.string()
+                contents[key] = self.payload(inner)
         if tag in (11, 12):
             length = self.unpack("i")
             assert length >= 0
