@@ -3,6 +3,7 @@
   "package": "mielon.thesift.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AncientCityTemplateMixin",
     "RiftPathfindingMixin",
     "BlockEntityTypeBlocksAccessor",
     "NoteBlockMixin",
