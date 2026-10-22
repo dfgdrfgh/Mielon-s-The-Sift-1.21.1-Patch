@@ -22,9 +22,9 @@ Weather start/stop and intensity packets stay within their source dimension. Rai
 
 ## Ancient City compatibility
 
-The three vanilla Ancient City center structure templates containing Sonorous Deepslate are also bundled under `the_sift:ancient_city/city_center/*`. Only those three structure lookups are redirected to The Sift's namespace; every other Minecraft structure is left untouched. This prevents another mod's data-pack priority from removing the Sonorous Deepslate blocks from newly generated Ancient City centers. Existing generated cities are not retroactively changed.
+The three vanilla Ancient City center structure templates containing Sonorous Deepslate are also bundled under `the_sift:ancient_city/city_center/*`. The vanilla Ancient City center template pool explicitly references these owned copies (with the original three equal weights and vanilla degradation processors). The existing template loader fallback is kept for compatibility. Other Ancient City pieces and placement rules are untouched. This reduces the chance that a conflicting structure-template resource override removes Sonorous Deepslate from newly generated city centers. Existing generated cities are not retroactively changed.
 
-The `scripts/check_ancient_city_templates.py` regression test confirms the original and namespaced templates match byte-for-byte and contain Sonorous Deepslate.
+The `scripts/check_ancient_city_templates.py` regression test confirms that the pool references the three namespaced templates, that originals and copies match byte-for-byte, and that each NBT contains real Sonorous Deepslate block placements (not just palette names).
 
 ## Build from source
 
