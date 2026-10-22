@@ -30,9 +30,6 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
-      - name: Verify Ancient City Sonorous Deepslate templates
-        run: python3 scripts/check_ancient_city_templates.py
-
       - name: Compile and remap Fabric mod
         run: ./gradlew --no-daemon --stacktrace build
 

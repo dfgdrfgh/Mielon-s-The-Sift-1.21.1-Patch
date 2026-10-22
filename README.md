@@ -20,12 +20,6 @@ All five spawn eggs use their full-color custom sprites with generated edge geom
 
 Weather start/stop and intensity packets stay within their source dimension. Rain in The Sift no longer appears in a clear Overworld or leaves `/weather clear` ineffective. Independent dimension weather and weather commands are retained.
 
-## Ancient City compatibility
-
-The three vanilla Ancient City center structure templates containing Sonorous Deepslate are also bundled under `the_sift:ancient_city/city_center/*`. The vanilla Ancient City center template pool explicitly references these owned copies (with the original three equal weights and vanilla degradation processors). The existing template loader fallback is kept for compatibility. Other Ancient City pieces and placement rules are untouched. This reduces the chance that a conflicting structure-template resource override removes Sonorous Deepslate from newly generated city centers. Existing generated cities are not retroactively changed.
-
-The `scripts/check_ancient_city_templates.py` regression test confirms that the pool references the three namespaced templates, that originals and copies match byte-for-byte, and that each NBT contains real Sonorous Deepslate block placements (not just palette names).
-
 ## Build from source
 
 Set `JAVA_HOME` to a JDK 21 installation, then run:
